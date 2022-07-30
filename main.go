@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 
+	"github.com/SDC-Paprika/go-products/controllers"
 	"github.com/gin-gonic/gin"
 )
 
@@ -10,20 +11,19 @@ func main() {
 	router := gin.Default()
 
 	products := router.Group("/products")
+	{
+		product := new(controllers.ProductsController)
 
-	products.GET("/", getProducts)
-	products.GET("/:productId", getDetails)
-	products.GET("/:productId/styles", getStyles)
-	products.GET("/:productId/related", getRelated)
+		products.GET("/", product.GetProducts)
+		products.GET("/:productId", getDetails)
+		products.GET("/:productId/styles", getStyles)
+		products.GET("/:productId/related", getRelated)
+	}
 
 	router.Run(":6868")
 }
 
 /* TODO: Move handler functions to controllers */
-
-func getProducts(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, []string{"butts", "nuts"})
-}
 
 func getDetails(c *gin.Context) {
 	productId := c.Param("productId")
