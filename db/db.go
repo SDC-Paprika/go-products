@@ -1,21 +1,19 @@
 package db
 
 import (
-	"database/sql"
+	"context"
 	"fmt"
 	"log"
 	"os"
 
-	"github.com/go-gorp/gorp"
-	_ "github.com/lib/pq" // postgres
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type DB struct {
-	*sql.DB
+	*pgxpool.Pool
 }
 
-// TODO: gorm? gorp?
-var db *gorp.DbMap
+var db DB
 
 func Init() {
 	dbConfig := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", os.Getenv("DB_USER"), os.Getenv("DB_PASS"), os.Getenv("DB_NAME"))
@@ -27,21 +25,19 @@ func Init() {
 	}
 }
 
-func ConnectDB(dataSourceName string) (*gorp.DbMap, error) {
-	db, err := sql.Open("postgres", dataSourceName)
+func ConnectDB(connString string) (DB, error) {
+	db, err := pgxpool.New(context.Background(), connString)
 	if err != nil {
-		return nil, err
+		return DB{}, err
 	}
 
-	if err = db.Ping(); err != nil {
-		return nil, err
+	if err = db.Ping(context.Background()); err != nil {
+		return DB{}, err
 	}
 
-	dbMap := &gorp.DbMap{Db: db, Dialect: gorp.PostgresDialect{}}
-	//dbmap.TraceOn("[gorp]", log.New(os.Stdout, "golang-gin:", log.Lmicroseconds)) //Trace database requests
-	return dbMap, nil
+	return DB{db}, nil
 }
 
-func GetDB() *gorp.DbMap {
+func GetDB() DB {
 	return db
 }

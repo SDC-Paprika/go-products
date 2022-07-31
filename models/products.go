@@ -1,6 +1,8 @@
 package models
 
 import (
+	"context"
+
 	"github.com/SDC-Paprika/go-products/db"
 )
 
@@ -19,7 +21,18 @@ func (p ProductsModel) Get(page, count int) (products []Product, err error) {
 	offset := count * (page - 1)
 	query := "SELECT * FROM products LIMIT $1 OFFSET $2"
 
-	_, err = db.GetDB().Select(&products, query, count, offset)
+	rows, err := db.GetDB().Query(context.Background(), query, count, offset)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var p Product
+		if err := rows.Scan(&p); err != nil {
+			return nil, err
+		}
+		products = append(products, p)
+	}
 
 	return
 }
