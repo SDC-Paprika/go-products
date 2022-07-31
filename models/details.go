@@ -24,7 +24,6 @@ type Feats struct {
 type DetailsModel struct{}
 
 func (d DetailsModel) Get(productId int) (details Details, err error) {
-	// query := "SELECT products.*, (SELECT json_agg(f) FROM (SELECT feature, value FROM features WHERE product_id = $1) AS f) AS features FROM products WHERE id = $1"
 	query := `
 		SELECT
 			p.id,

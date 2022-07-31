@@ -28,11 +28,10 @@ func (p ProductsModel) Get(page, count int) (products []Product, err error) {
 
 	for rows.Next() {
 		var p Product
-		if err := rows.Scan(&p); err != nil {
+		if err = rows.Scan(&p); err != nil {
 			return nil, err
 		}
 		products = append(products, p)
 	}
-
 	return
 }
