@@ -1,8 +1,14 @@
 package models
 
+import (
+	"context"
+
+	"github.com/SDC-Paprika/go-products/db"
+)
+
 type Styles struct {
-	ID  int       `db:"id" json:"product_id"`
-	Res []Results `json:"results"`
+	ID  int     `db:"id" json:"product_id"`
+	Res Results `json:"results"`
 }
 
 type Results struct {
@@ -28,6 +34,14 @@ type SKUs struct {
 type StylesModel struct{}
 
 func (s StylesModel) Get(productId int) (styles Styles, err error) {
+	query := db.Queries["stylesQuery"]
 
+	var results Results
+	err = db.GetDB().QueryRow(context.Background(), query, productId).Scan(&results)
+	if err != nil {
+		return
+	}
+
+	styles = Styles{ID: productId, Res: results}
 	return
 }
