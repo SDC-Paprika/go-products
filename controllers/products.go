@@ -25,9 +25,9 @@ func (ctrl ProductsController) GetProducts(c *gin.Context) {
 
 	results, err := productsModel.Get(page, count)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{"Message": "Could not get products"})
+		c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{"Message": "failed to get products: " + err.Error()})
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, results)
+	c.JSON(http.StatusOK, results)
 }

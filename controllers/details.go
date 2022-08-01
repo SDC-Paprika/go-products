@@ -17,14 +17,17 @@ func (ctrl DetailsController) GetDetails(c *gin.Context) {
 	var err error
 
 	if productId, err = strconv.Atoi(c.Param("productId")); err != nil {
-		productId = 1
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"Message": "error parsing product id: " + err.Error()})
+	}
+	if productId < 1 || productId > 1000011 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"Message": "bad product id: " + c.Param("productId")})
 	}
 
 	results, err := detailsModel.Get(productId)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{"Message": "Could not get details"})
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"Message": "Could not get details"})
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, results)
+	c.JSON(http.StatusOK, results)
 }
